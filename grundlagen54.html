@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russische Grammatik: Passive Partizipien der Vergangenheit</title>
+    
+    <!-- DragDropTouch Polyfill für mobile Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #ecf0f1;
+            --box-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--box-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 30px;
+        }
+
+        .intro-box {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .exercise-block {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .question {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        /* Buttons */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-reset { background-color: #f39c12; }
+        .btn-reset:hover { background-color: #d68910; }
+
+        .btn-solve { background-color: var(--secondary-color); }
+        .btn-solve:hover { background-color: #2980b9; }
+
+        /* Form elements */
+        select {
+            padding: 5px;
+            font-size: 1em;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+
+        /* Feedback classes */
+        .correct-text { color: var(--success-color); font-weight: bold; }
+        .error-text { color: var(--error-color); font-weight: bold; text-decoration: line-through; }
+        
+        .correct-bg { background-color: #d5f5e3 !important; border-color: var(--success-color) !important; color: #1e8449;}
+        .error-bg { background-color: #fadbd8 !important; border-color: var(--error-color) !important; color: #922b21;}
+
+        /* Drag & Drop */
+        .dnd-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drag-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 50px;
+            padding: 15px;
+            background-color: #fff;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+        }
+
+        .draggable {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+        }
+
+        .drop-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .dropzone {
+            width: 200px;
+            height: 40px;
+            border: 2px dashed var(--secondary-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dropzone.hover {
+            background-color: #e8f4f8;
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
+            button { width: 100%; }
+            .drop-row { flex-direction: column; align-items: flex-start; gap: 5px; margin-bottom: 20px; }
+            .dropzone { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Passive Partizipien der Vergangenheit</h1>
+
+    <div class="intro-box">
+        <h2>Einführung</h2>
+        <p>Das passive Partizip der Vergangenheit beschreibt ein Nomen, mit dem eine Handlung in der Vergangenheit durchgeführt wurde (z. B. „das gelesene Buch“, „das geöffnete Fenster“).</p>
+        <p><strong>Bildung:</strong> Es wird ausschließlich von transitiven Verben im <strong>vollendeten Aspekt</strong> (СВ) gebildet.</p>
+        <ul>
+            <li>Man nimmt die Vergangenheitsform für das Pronomen „он“.</li>
+            <li>Man entfernt das abschließende „л“ (und manchmal den Vokal davor).</li>
+            <li>Man hängt eines der folgenden Suffixe sowie die Adjektivendung an:
+                <ul>
+                    <li><strong>-нн-</strong> (nach а/я): сделать → сделал → сделанный</li>
+                    <li><strong>-енн- / -ённ-</strong> (nach Konsonanten oder wenn der Infinitiv auf -ить/-еть endet): решить → решил → решённый</li>
+                    <li><strong>-т-</strong> (bei bestimmten Verben, oft einsilbig): открыть → открыл → открытый</li>
+                </ul>
+            </li>
+        </ul>
+        <p>Grammatikalisch verhalten sie sich wie Adjektive und werden in Geschlecht, Zahl und Fall an ihr Bezugswort angepasst.</p>
+    </div>
+
+    <!-- Block 1: Multiple Choice -->
+    <div class="exercise-block" id="block1">
+        <h2>Teil 1: Bildung des Partizips (Multiple Choice)</h2>
+        <p>Wählen Sie das korrekte passive Partizip der Vergangenheit für das angegebene Verb.</p>
+        
+        <div class="questions-container">
+            <div class="question" data-answer="v2">
+                1. построить
+                <div class="radio-group">
+                    <label><input type="radio" name="q1" value="v1"> построивший</label>
+                    <label><input type="radio" name="q1" value="v2"> построенный</label>
+                    <label><input type="radio" name="q1" value="v3"> построитый</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v1">
+                2. забыть
+                <div class="radio-group">
+                    <label><input type="radio" name="q2" value="v1"> забытый</label>
+                    <label><input type="radio" name="q2" value="v2"> забынный</label>
+                    <label><input type="radio" name="q2" value="v3"> забывший</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v3">
+                3. перевести
+                <div class="radio-group">
+                    <label><input type="radio" name="q3" value="v1"> перевевший</label>
+                    <label><input type="radio" name="q3" value="v2"> перевестый</label>
+                    <label><input type="radio" name="q3" value="v3"> переведённый</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v2">
+                4. увидеть
+                <div class="radio-group">
+                    <label><input type="radio" name="q4" value="v1"> увидящий</label>
+                    <label><input type="radio" name="q4" value="v2"> увиденный</label>
+                    <label><input type="radio" name="q4" value="v3"> увидетый</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v1">
+                5. сделать
+                <div class="radio-group">
+                    <label><input type="radio" name="q5" value="v1"> сделанный</label>
+                    <label><input type="radio" name="q5" value="v2"> сделавший</label>
+                    <label><input type="radio" name="q5" value="v3"> сделенный</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-reset" onclick="resetRadios('block1')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadios('block1')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Block 2: Dropdown -->
+    <div class="exercise-block" id="block2">
+        <h2>Teil 2: Deklination im Satz (Dropdown)</h2>
+        <p>Wählen Sie die grammatikalisch korrekte Form des Partizips, sodass sie zum Bezugswort passt.</p>
+        
+        <div class="questions-container">
+            <div class="question">
+                1. Я читаю книгу, 
+                <select data-answer="v2">
+                    <option value="">-- bitte wählen --</option>
+                    <option value="v1">написанный</option>
+                    <option value="v2">написанную</option>
+                    <option value="v3">написанной</option>
+                </select> 
+                известным автором.
+            </div>
+            <div class="question">
+                2. Мы живём в доме, 
+                <select data-answer="v3">
+                    <option value="">-- bitte wählen --</option>
+                    <option value="v1">построенный</option>
+                    <option value="v2">построенного</option>
+                    <option value="v3">построенном</option>
+                </select> 
+                в прошлом году.
+            </div>
+            <div class="question">
+                3. Где письмо, 
+                <select data-answer="v1">
+                    <option value="">-- bitte wählen --</option>
+                    <option value="v1">отправленное</option>
+                    <option value="v2">отправленная</option>
+                    <option value="v3">отправленный</option>
+                </select> 
+                вчера?
+            </div>
+            <div class="question">
+                4. Они говорят о словах, 
+                <select data-answer="v3">
+                    <option value="">-- bitte wählen --</option>
+                    <option value="v1">забытые</option>
+                    <option value="v2">забытыми</option>
+                    <option value="v3">забытых</option>
+                </select> 
+                нами.
+            </div>
+            <div class="question">
+                5. Я вижу окно, 
+                <select data-answer="v1">
+                    <option value="">-- bitte wählen --</option>
+                    <option value="v1">открытое</option>
+                    <option value="v2">открытую</option>
+                    <option value="v3">открытый</option>
+                </select> 
+                ветром.
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-reset" onclick="resetSelects('block2')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSelects('block2')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Block 3: Drag & Drop -->
+    <div class="exercise-block" id="block3">
+        <h2>Teil 3: Verben zuordnen (Drag & Drop)</h2>
+        <p>Ziehen Sie das korrekte Partizip in das leere Feld neben dem entsprechenden Infinitiv.</p>
+
+        <div class="dnd-container">
+            <div class="drag-pool" id="pool3">
+                <div class="draggable" draggable="true" id="drag1" data-val="прочитанный">прочитанный</div>
+                <div class="draggable" draggable="true" id="drag2" data-val="решённый">решённый</div>
+                <div class="draggable" draggable="true" id="drag3" data-val="спетый">спетый</div>
+                <div class="draggable" draggable="true" id="drag4" data-val="купленный">купленный</div>
+                <div class="draggable" draggable="true" id="drag5" data-val="посеянный">посеянный</div>
+            </div>
+
+            <div class="drop-area">
+                <div class="drop-row">
+                    <span>1. купить</span>
+                    <div class="dropzone" data-answer="купленный"></div>
+                </div>
+                <div class="drop-row">
+                    <span>2. прочитать</span>
+                    <div class="dropzone" data-answer="прочитанный"></div>
+                </div>
+                <div class="drop-row">
+                    <span>3. посеять</span>
+                    <div class="dropzone" data-answer="посеянный"></div>
+                </div>
+                <div class="drop-row">
+                    <span>4. решить</span>
+                    <div class="dropzone" data-answer="решённый"></div>
+                </div>
+                <div class="drop-row">
+                    <span>5. спеть</span>
+                    <div class="dropzone" data-answer="спетый"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-reset" onclick="resetDnD('block3')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDnD('block3')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Block 4: Multiple Choice (Aktiv vs. Passiv) -->
+    <div class="exercise-block" id="block4">
+        <h2>Teil 4: Aktiv oder Passiv? (Multiple Choice)</h2>
+        <p>Wählen Sie die korrekte Übersetzung bzw. Form. Achten Sie darauf, ob das Bezugswort die Handlung selbst ausführt (Aktiv) oder ob etwas mit ihm gemacht wurde (Passiv).</p>
+        
+        <div class="questions-container">
+            <div class="question" data-answer="v1">
+                1. Das vom Autor geschriebene Buch
+                <div class="radio-group">
+                    <label><input type="radio" name="q6" value="v1"> книга, написанная автором</label>
+                    <label><input type="radio" name="q6" value="v2"> книга, написавшая автора</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v2">
+                2. Die Sängerin, die das Lied gesungen hat
+                <div class="radio-group">
+                    <label><input type="radio" name="q7" value="v1"> певица, спетая песню</label>
+                    <label><input type="radio" name="q7" value="v2"> певица, спевшая песню</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v2">
+                3. Der gestern gekaufte Computer
+                <div class="radio-group">
+                    <label><input type="radio" name="q8" value="v1"> купивший вчера компьютер</label>
+                    <label><input type="radio" name="q8" value="v2"> купленный вчера компьютер</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v1">
+                4. Das von den Kindern gelesene Märchen
+                <div class="radio-group">
+                    <label><input type="radio" name="q9" value="v1"> сказка, прочитанная детьми</label>
+                    <label><input type="radio" name="q9" value="v2"> сказка, прочитавшая детей</label>
+                </div>
+            </div>
+            <div class="question" data-answer="v1">
+                5. Der Schüler, der die Aufgabe gelöst hat
+                <div class="radio-group">
+                    <label><input type="radio" name="q10" value="v1"> ученик, решивший задачу</label>
+                    <label><input type="radio" name="q10" value="v2"> ученик, решённый задачу</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-reset" onclick="resetRadios('block4')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadios('block4')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // --- Immediate Feedback for Radio Buttons (Blocks 1 & 4) ---
+        document.querySelectorAll('input').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const question = this.closest('.question');
+                const correctAnswer = question.getAttribute('data-answer');
+                
+                // Clear previous formatting
+                question.querySelectorAll('label').forEach(lbl => {
+                    lbl.classList.remove('correct-text', 'error-text');
+                });
+                
+                // Apply new formatting based on selection
+                const label = this.closest('label');
+                if (this.value === correctAnswer) {
+                    label.classList.add('correct-text');
+                } else {
+                    label.classList.add('error-text');
+                }
+            });
+        });
+
+        // --- Immediate Feedback for Dropdowns (Block 2) ---
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function() {
+                this.classList.remove('correct-bg', 'error-bg');
+                
+                if (this.value !== "") {
+                    if (this.value === this.getAttribute('data-answer')) {
+                        this.classList.add('correct-bg');
+                    } else {
+                        this.classList.add('error-bg');
+                    }
+                }
+            });
+        });
+
+        // --- Drag & Drop Setup & Immediate Feedback (Block 3) ---
+        const draggables = document.querySelectorAll('.draggable');
+        const dropzones = document.querySelectorAll('.dropzone');
+        const pool = document.getElementById('pool3');
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', function() {
+                this.classList.add('dragging');
+                
+                // If the element was in a dropzone, clear the background of that dropzone
+                const parentZone = this.closest('.dropzone');
+                if (parentZone) {
+                    parentZone.classList.remove('correct-bg', 'error-bg');
+                }
+            });
+
+            draggable.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        });
+
+        // Allow dropping back into the pool
+        pool.addEventListener('dragover', e => {
+            e.preventDefault();
+        });
+        
+        pool.addEventListener('drop', e => {
+            e.preventDefault();
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                pool.appendChild(draggable);
+            }
+        });
+
+        // Dropzones logic
+        dropzones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                zone.classList.add('hover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('hover');
+            });
+
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('hover');
+                const draggable = document.querySelector('.dragging');
+                
+                if (draggable) {
+                    // If dropzone already has an item, return the old one to the pool
+                    if (zone.children.length > 0) {
+                        const existingItem = zone.firstElementChild;
+                        pool.appendChild(existingItem);
+                    }
+                    zone.appendChild(draggable);
+                    
+                    // Trigger immediate feedback evaluation
+                    zone.classList.remove('correct-bg', 'error-bg');
+                    if (draggable.getAttribute('data-val') === zone.getAttribute('data-answer')) {
+                        zone.classList.add('correct-bg');
+                    } else {
+                        zone.classList.add('error-bg');
+                    }
+                }
+            });
+        });
+    });
+
+    // --- Reset & Solve Functions ---
+
+    // For Radio Buttons
+    function resetRadios(blockId) {
+        const block = document.getElementById(blockId);
+        const radios = block.querySelectorAll('input');
+        const labels = block.querySelectorAll('label');
+        
+        radios.forEach(radio => radio.checked = false);
+        labels.forEach(lbl => lbl.classList.remove('correct-text', 'error-text'));
+    }
+
+    function solveRadios(blockId) {
+        resetRadios(blockId);
+        const block = document.getElementById(blockId);
+        const questions = block.querySelectorAll('.question');
+        
+        questions.forEach(q => {
+            const correctAnswer = q.getAttribute('data-answer');
+            // Select exactly the radio button with the correct value
+            const correctRadio = q.querySelector(`input`);
+            if (correctRadio) {
+                correctRadio.checked = true;
+                correctRadio.closest('label').classList.add('correct-text');
+            }
+        });
+    }
+
+    // For Dropdowns
+    function resetSelects(blockId) {
+        const block = document.getElementById(blockId);
+        const selects = block.querySelectorAll('select');
+        
+        selects.forEach(sel => {
+            sel.value = "";
+            sel.classList.remove('correct-bg', 'error-bg');
+        });
+    }
+
+    function solveSelects(blockId) {
+        resetSelects(blockId);
+        const block = document.getElementById(blockId);
+        const selects = block.querySelectorAll('select');
+        
+        selects.forEach(sel => {
+            sel.value = sel.getAttribute('data-answer');
+            sel.classList.add('correct-bg');
+        });
+    }
+
+    // For Drag & Drop
+    function resetDnD(blockId) {
+        const block = document.getElementById(blockId);
+        const dropzones = block.querySelectorAll('.dropzone');
+        const pool = document.getElementById('pool3');
+        
+        dropzones.forEach(zone => {
+            zone.classList.remove('correct-bg', 'error-bg');
+            if (zone.children.length > 0) {
+                pool.appendChild(zone.firstElementChild);
+            }
+        });
+    }
+
+    function solveDnD(blockId) {
+        resetDnD(blockId);
+        const block = document.getElementById(blockId);
+        const dropzones = block.querySelectorAll('.dropzone');
+        const pool = document.getElementById('pool3');
+        const draggables = pool.querySelectorAll('.draggable'); 
+        
+        dropzones.forEach(zone => {
+            const correctAnswer = zone.getAttribute('data-answer');
+            draggables.forEach(drag => {
+                if (drag.getAttribute('data-val') === correctAnswer) {
+                    zone.appendChild(drag);
+                    zone.classList.add('correct-bg');
+                }
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
