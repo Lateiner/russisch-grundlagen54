@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktiv vs. Passiv: 10 Übungen zu russischen Partizipien</title>
+    <!-- Polyfill für Touch-Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f0f3f5;
+            --card-bg: #ffffff;
+            --active-focus: #e67e22;
+            --passive-focus: #9b59b6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 { text-align: center; margin-bottom: 5px; color: var(--primary-color); }
+        h3 { text-align: center; color: var(--secondary-color); font-weight: 300; margin-bottom: 30px; }
+
+        .intro-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 6px solid var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .exercise-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .situation-box {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .icon { font-size: 2.5rem; }
+        .description { font-weight: 600; font-size: 1.1rem; }
+
+        .focus-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .focus-label {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .focus-actor { background-color: var(--active-focus); }
+        .focus-object { background-color: var(--passive-focus); }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover { border-color: var(--secondary-color); background-color: #f7fbff; }
+
+        .option-btn.correct {
+            border-color: var(--success-color) !important;
+            background-color: #eafaf1 !important;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            border-color: var(--error-color) !important;
+            background-color: #fdedec !important;
+            color: var(--error-color);
+        }
+
+        .participle { text-decoration: underline; font-weight: bold; }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            padding-bottom: 50px;
+        }
+
+        button.action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .btn-reset { background-color: #bdc3c7; color: #2c3e50; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+
+        @media (max-width: 650px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .situation-box { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Aktiv vs. Passiv</h1>
+    <h3>Diskriminierung der russischen Partizipien</h3>
+
+    <div class="intro-box">
+        Wähle den Satz aus, der die Situation mit dem richtigen Fokus beschreibt:
+        <br>• <strong>Aktiv (-вш-):</strong> Die handelnde Person steht im Mittelpunkt.
+        <br>• <strong>Passiv (-нн-/-т-):</strong> Das Objekt der Handlung steht im Mittelpunkt.
+    </div>
+
+    <div id="exercise-container">
+        <!-- Aufgabe 1 -->
+        <div class="exercise-card" data-correct="0">
+            <div class="situation-box">
+                <span class="icon">👨‍🎨</span>
+                <span class="description">Der Maler hat ein Bild gemalt.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-actor">Fokus: Der Maler (Aktiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, true)">Художник, <span class="participle">написавший</span> картину...</button>
+                <button class="option-btn" onclick="check(this, false)">Художник, <span class="participle">написанная</span> картину...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 2 -->
+        <div class="exercise-card" data-correct="1">
+            <div class="situation-box">
+                <span class="icon">🖼️</span>
+                <span class="description">Der Maler hat ein Bild gemalt.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-object">Fokus: Das Bild (Passiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, false)">Картина, <span class="participle">написавшая</span> художником...</button>
+                <button class="option-btn" onclick="check(this, true)">Картина, <span class="participle">написанная</span> художником...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 3 -->
+        <div class="exercise-card" data-correct="0">
+            <div class="situation-box">
+                <span class="icon">🏗️</span>
+                <span class="description">Die Arbeiter haben das Haus gebaut.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-actor">Fokus: Die Arbeiter (Aktiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, true)">Рабочие, <span class="participle">построившие</span> дом...</button>
+                <button class="option-btn" onclick="check(this, false)">Рабочие, <span class="participle">построенные</span> дом...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 4 -->
+        <div class="exercise-card" data-correct="1">
+            <div class="situation-box">
+                <span class="icon">🏠</span>
+                <span class="description">Die Arbeiter haben das Haus gebaut.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-object">Fokus: Das Haus (Passiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, false)">Дом, <span class="participle">построивший</span> рабочими...</button>
+                <button class="option-btn" onclick="check(this, true)">Дом, <span class="participle">построенный</span> рабочими...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 5 -->
+        <div class="exercise-card" data-correct="1">
+            <div class="situation-box">
+                <span class="icon">📄</span>
+                <span class="description">Die Studentin hat den Text übersetzt.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-object">Fokus: Der Text (Passiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, false)">Текст, <span class="participle">переведший</span> студенткой...</button>
+                <button class="option-btn" onclick="check(this, true)">Текст, <span class="participle">переведённый</span> студенткой...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 6 -->
+        <div class="exercise-card" data-correct="0">
+            <div class="situation-box">
+                <span class="icon">👩‍🎤</span>
+                <span class="description">Die Sängerin hat das Lied gesungen.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-actor">Fokus: Die Sängerin (Aktiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, true)">Певица, <span class="participle">спевшая</span> песню...</button>
+                <button class="option-btn" onclick="check(this, false)">Певица, <span class="participle">спетая</span> песню...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 7 -->
+        <div class="exercise-card" data-correct="1">
+            <div class="situation-box">
+                <span class="icon">🎵</span>
+                <span class="description">Die Sängerin hat das Lied gesungen.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-object">Fokus: Das Lied (Passiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, false)">Песня, <span class="participle">спевшая</span> певицей...</button>
+                <button class="option-btn" onclick="check(this, true)">Песня, <span class="participle">спетая</span> певицей...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 8 -->
+        <div class="exercise-card" data-correct="0">
+            <div class="situation-box">
+                <span class="icon">🧔</span>
+                <span class="description">Der Vater hat das Fenster geöffnet.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-actor">Fokus: Der Vater (Aktiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, true)">Папа, <span class="participle">открывший</span> окно...</button>
+                <button class="option-btn" onclick="check(this, false)">Папа, <span class="participle">открытое</span> окно...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 9 -->
+        <div class="exercise-card" data-correct="1">
+            <div class="situation-box">
+                <span class="icon">🪟</span>
+                <span class="description">Der Vater hat das Fenster geöffnet.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-object">Fokus: Das Fenster (Passiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, false)">Окно, <span class="participle">открывшее</span> папой...</button>
+                <button class="option-btn" onclick="check(this, true)">Окно, <span class="participle">открытое</span> папой...</button>
+            </div>
+        </div>
+
+        <!-- Aufgabe 10 -->
+        <div class="exercise-card" data-correct="0">
+            <div class="situation-box">
+                <span class="icon">👩‍🍳</span>
+                <span class="description">Die Köchin hat das Abendessen zubereitet.</span>
+            </div>
+            <div class="focus-info">
+                <span class="focus-label focus-actor">Fokus: Die Köchin (Aktiv)</span>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="check(this, true)">Повар, <span class="participle">приготовившая</span> ужин...</button>
+                <button class="option-btn" onclick="check(this, false)">Повар, <span class="participle">приготовленная</span> ужин...</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    function check(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('.option-btn');
+        
+        buttons.forEach(b => {
+            b.classList.remove('correct', 'incorrect');
+        });
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('incorrect');
+        }
+    }
+
+    function resetAll() {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => {
+            b.classList.remove('correct', 'incorrect');
+        });
+    }
+
+    function showAllSolutions() {
+        const cards = document.querySelectorAll('.exercise-card');
+        cards.forEach(card => {
+            const correctIdx = parseInt(card.getAttribute('data-correct'));
+            const buttons = card.querySelectorAll('.option-btn');
+            buttons.forEach((b, idx) => {
+                b.classList.remove('correct', 'incorrect');
+                if (idx === correctIdx) {
+                    b.classList.add('correct');
+                }
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
