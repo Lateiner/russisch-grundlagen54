@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktive Zeichensetzung: Partizipialgruppen</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten (hier für Klick-Events optimiert) -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f9fbff;
+            --card-bg: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 { text-align: center; color: var(--primary-color); margin-bottom: 10px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 300; margin-bottom: 30px; }
+
+        .rules-box {
+            background-color: #e8f4fd;
+            border-left: 6px solid var(--secondary-color);
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .rules-box b { color: var(--secondary-color); }
+
+        .exercise-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sentence-row {
+            padding: 15px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1.15rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .word {
+            margin: 5px 0;
+        }
+
+        /* Die klickbaren Komma-Zonen */
+        .comma-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 30px;
+            margin: 0 2px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.4rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .comma-slot:hover {
+            background-color: #e0e0e0;
+        }
+
+        .comma-slot.correct {
+            color: var(--success-color);
+            background-color: #eafaf1;
+        }
+
+        .comma-slot.incorrect {
+            color: var(--error-color);
+            background-color: #fdedec;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #bdc3c7; color: #2c3e50; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+        button:hover { opacity: 0.9; }
+
+        .feedback-text {
+            display: block;
+            width: 100%;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .sentence-row { font-size: 1rem; }
+            .comma-slot { width: 18px; height: 26px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Zeichensetzung</h1>
+    <h2>Partizipialgruppen (Причастный оборот)</h2>
+
+    <div class="rules-box">
+        <strong>Die Regel:</strong>
+        <ul>
+            <li>Steht die Partizipialgruppe <b>nach</b> dem Substantiv, wird sie durch Kommas abgetrennt.<br>
+            (z.B. Книга<b>,</b> прочитанная мной<b>,</b> лежала здесь.)</li>
+            <li>Steht die Partizipialgruppe <b>vor</b> dem Substantiv, wird <b>kein</b> Komma gesetzt.<br>
+            (z.B. Прочитанная мной книга лежала здесь.)</li>
+        </ul>
+        <p><em>Klicke auf die grauen Felder, um ein Komma zu setzen!</em></p>
+    </div>
+
+    <div class="exercise-section" id="exercise-container">
+        <!-- Sätze werden durch JavaScript geladen -->
+    </div>
+
+    <div class="controls">
+        <button class="btn-reset" onclick="resetExercise()">Zurücksetzen</button>
+        <button class="btn-solution" onclick="showSolution()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    // Struktur: text-Teile und die Indices, an denen ein Komma sein MUSS
+    const sentences = [
+        {
+            parts: ["Письмо", "написанное братом", "лежало на столе."],
+            correctSlots: [0, 1] // Komma nach Wort 0 und Wort 1
+        },
+        {
+            parts: ["Написанное братом", "письмо", "лежало на столе."],
+            correctSlots: [] // Kein Komma
+        },
+        {
+            parts: ["Мы увидели дом", "построенный в прошлом году."],
+            correctSlots: [0]
+        },
+        {
+            parts: ["Построенный в прошлом году", "дом", "был очень красивым."],
+            correctSlots: []
+        },
+        {
+            parts: ["Студенты", "прочитавшие текст", "начали обсуждение."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Прочитавшие текст", "студенty", "начали обсуждение."],
+            correctSlots: []
+        },
+        {
+            parts: ["Я читаю книгу", "купленную вчера."],
+            correctSlots: [0]
+        },
+        {
+            parts: ["Купленная вчера", "книга", "очень интересная."],
+            correctSlots: []
+        },
+        {
+            parts: ["Цветы", "посаженные мамой", "уже выросли."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Посаженные мамой", "цветы", "уже выросли."],
+            correctSlots: []
+        },
+        {
+            parts: ["Статья", "переведённая студентом", "была трудной."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Переведённая студентом", "статья", "была трудной."],
+            correctSlots: []
+        },
+        {
+            parts: ["Окно", "открытое папой", "выходило в сад."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Открытое папой", "окно", "выходиlo в сад."],
+            correctSlots: []
+        },
+        {
+            parts: ["Работа", "сделанная вовремя", "очень важна."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Сделанная вовремя", "работа", "очень важна."],
+            correctSlots: []
+        },
+        {
+            parts: ["Задачи", "решённые учеником", "были сложными."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Решённые учеником", "задачи", "были сложными."],
+            correctSlots: []
+        },
+        {
+            parts: ["Автор", "написавший этот текст", "известен всем."],
+            correctSlots: [0, 1]
+        },
+        {
+            parts: ["Написавший этот текст", "автор", "известен всем."],
+            correctSlots: []
+        }
+    ];
+
+    const container = document.getElementById('exercise-container');
+
+    function renderSentences() {
+        container.innerHTML = '';
+        sentences.forEach((s, sIdx) => {
+            const row = document.createElement('div');
+            row.className = 'sentence-row';
+            
+            s.parts.forEach((part, pIdx) => {
+                const span = document.createElement('span');
+                span.className = 'word';
+                span.textContent = part;
+                row.appendChild(span);
+
+                // Wenn es nicht der letzte Teil ist, füge einen Komma-Slot ein
+                if (pIdx < s.parts.length - 1) {
+                    const slot = document.createElement('span');
+                    slot.className = 'comma-slot';
+                    slot.id = `slot-${sIdx}-${pIdx}`;
+                    slot.textContent = ' ';
+                    slot.onclick = () => handleSlotClick(slot, sIdx, pIdx);
+                    row.appendChild(slot);
+                }
+            });
+            container.appendChild(row);
+        });
+    }
+
+    function handleSlotClick(slot, sIdx, pIdx) {
+        const isCorrect = sentences[sIdx].correctSlots.includes(pIdx);
+        
+        if (isCorrect) {
+            slot.textContent = ',';
+            slot.className = 'comma-slot correct';
+        } else {
+            slot.textContent = ',';
+            slot.className = 'comma-slot incorrect';
+            // Nach kurzer Zeit das falsche Komma wieder entfernen oder rot lassen
+            setTimeout(() => {
+                if(slot.className.includes('incorrect')) {
+                    slot.textContent = ' ';
+                    slot.className = 'comma-slot';
+                }
+            }, 1000);
+        }
+    }
+
+    function resetExercise() {
+        renderSentences();
+    }
+
+    function showSolution() {
+        sentences.forEach((s, sIdx) => {
+            // Alle Slots dieses Satzes prüfen
+            for (let pIdx = 0; pIdx < s.parts.length - 1; pIdx++) {
+                const slot = document.getElementById(`slot-${sIdx}-${pIdx}`);
+                if (s.correctSlots.includes(pIdx)) {
+                    slot.textContent = ',';
+                    slot.className = 'comma-slot correct';
+                } else {
+                    slot.textContent = ' ';
+                    slot.className = 'comma-slot';
+                }
+            }
+        });
+    }
+
+    // Initialisierung
+    renderSentences();
+
+</script>
+
+</body>
+</html>
