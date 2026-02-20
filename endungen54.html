@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deklinations-Puzzle: Russische Partizipien</title>
+    <!-- Polyfill für Touch-Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --tile-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; color: var(--primary-color); margin-bottom: 10px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 300; margin-bottom: 30px; }
+
+        .intro-box {
+            background-color: #eef7ff;
+            border-left: 6px solid var(--secondary-color);
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .exercise-unit {
+            background: #fff;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .sentence {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 50px;
+            border-bottom: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+            padding: 0 5px;
+            transition: color 0.3s;
+        }
+
+        .tile-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tile {
+            background-color: var(--tile-bg);
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tile:hover {
+            border-color: var(--secondary-color);
+            background-color: #fff;
+        }
+
+        .tile.correct {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-color: var(--success-color) !important;
+        }
+
+        .tile.incorrect {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            border-color: var(--error-color) !important;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            position: sticky;
+            bottom: 20px;
+        }
+
+        button.action-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button.action-btn:active { transform: translateY(2px); }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .sentence { font-size: 1rem; }
+            .tile { padding: 6px 10px; font-size: 0.85rem; }
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Deklinations-Puzzle</h1>
+    <h2>Passives Partizip Präteritum</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> Klicke auf die korrekte Endung, um den Satz zu vervollständigen. Das Partizip richtet sich in Genus, Numerus und Kasus nach dem Substantiv.
+    </div>
+
+    <div id="puzzle-container">
+        <!-- Aufgaben werden hier dynamisch geladen -->
+    </div>
+
+    <div class="controls">
+        <button class="action-btn btn-reset" onclick="resetAndShuffle()">Zurücksetzen und mischen</button>
+        <button class="action-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const allExercises = [
+        { id: 1, stem: "написанн", noun: "письмо", context: "Это ... письмо.", options: ["-ый", "-ая", "-ое", "-ые"], correct: "-ое" },
+        { id: 2, stem: "купленн", noun: "книга", context: "Это ... книга.", options: ["-ый", "-ая", "-ое", "-ые"], correct: "-ая" },
+        { id: 3, stem: "построенн", noun: "дом", context: "Мы видим ... дом.", options: ["-ый", "-ая", "-ое", "-ые"], correct: "-ый" },
+        { id: 4, stem: "открыт", noun: "окна", context: "В комнате ... окна.", options: ["-ый", "-ая", "-ое", "-ые"], correct: "-ые" },
+        { id: 5, stem: "прочитанн", noun: "статью", context: "Я обсуждаю ... статью.", options: ["-ую", "-ой", "-ая", "-ое"], correct: "-ую" },
+        { id: 6, stem: "забыт", noun: "ключах", context: "Он думает о ... ключах.", options: ["-ых", "-ым", "-ыми", "-ые"], correct: "-ых" },
+        { id: 7, stem: "сделанн", noun: "работы", context: "После ... работы мы отдыхали.", options: ["-ой", "-ую", "-ая", "-ое"], correct: "-ой" },
+        { id: 8, stem: "решённ", noun: "задачи", context: "Вот ... задачи.", options: ["-ые", "-ый", "-ая", "-ое"], correct: "-ые" },
+        { id: 9, stem: "увиденн", noun: "фильмом", context: "Он доволен ... фильмом.", options: ["-ым", "-ом", "-ого", "-ому"], correct: "-ым" },
+        { id: 10, stem: "закрыт", noun: "дверь", context: "Это ... дверь.", options: ["-ый", "-ая", "-ое", "-ые"], correct: "-ая" },
+        { id: 11, stem: "спет", noun: "песни", context: "Мы не слышали ... песни.", options: ["-ой", "-ую", "-ая", "-ое"], correct: "-ой" },
+        { id: 12, stem: "рассказанн", noun: "историю", context: "Дети слушали ... историю.", options: ["-ую", "-ой", "-ая", "-ое"], correct: "-ую" },
+        { id: 13, stem: "исправленн", noun: "ошибку", context: "Учитель заметил ... ошибку.", options: ["-ую", "-ой", "-ая", "-ое"], correct: "-ую" },
+        { id: 14, stem: "забыт", noun: "номер", context: "Я ввёл ... номер.", options: ["-ый", "-ом", "-ого", "-ому"], correct: "-ый" },
+        { id: 15, stem: "купленн", noun: "подарки", context: "Где ... подарки?", options: ["-ые", "-ый", "-ая", "-ое"], correct: "-ые" },
+        { id: 16, stem: "приготовленн", noun: "ужином", context: "Стол накрыт ... ужином.", options: ["-ым", "-ом", "-ого", "-ому"], correct: "-ым" },
+        { id: 17, stem: "открыт", noun: "окно", context: "Она подошла к ... окну.", options: ["-ому", "-ым", "-ого", "-ое"], correct: "-ому" },
+        { id: 18, stem: "потерянн", noun: "ключи", context: "Мы нашли ... ключи.", options: ["-ые", "-ый", "-ая", "-ое"], correct: "-ые" },
+        { id: 19, stem: "написанн", noun: "стихах", context: "В ... стихах много грусти.", options: ["-ых", "-ым", "-ыми", "-ые"], correct: "-ых" },
+        { id: 20, stem: "полученн", noun: "письма", context: "У меня нет ... письма.", options: ["-ого", "-ому", "-ым", "-ое"], correct: "-ого" }
+    ];
+
+    let currentExercises = [];
+
+    const container = document.getElementById('puzzle-container');
+
+    // Fisher-Yates Shuffle Algorithmus
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function renderExercises() {
+        container.innerHTML = '';
+        currentExercises.forEach((ex, index) => {
+            const unit = document.createElement('div');
+            unit.className = 'exercise-unit';
+            unit.id = `unit-${ex.id}`;
+
+            const sentenceDiv = document.createElement('div');
+            sentenceDiv.className = 'sentence';
+            const parts = ex.context.split('...');
+            sentenceDiv.innerHTML = `${index + 1}. ${parts[0]}<span class="gap" id="gap-${ex.id}">${ex.stem}...</span>${parts[1]}`;
+
+            const tileContainer = document.createElement('div');
+            tileContainer.className = 'tile-container';
+
+            ex.options.forEach(opt => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = opt;
+                tile.onclick = () => checkAnswer(ex.id, opt, tile);
+                tileContainer.appendChild(tile);
+            });
+
+            unit.appendChild(sentenceDiv);
+            unit.appendChild(tileContainer);
+            container.appendChild(unit);
+        });
+    }
+
+    function checkAnswer(exId, selectedOpt, tile) {
+        const ex = allExercises.find(e => e.id === exId);
+        const gap = document.getElementById(`gap-${exId}`);
+        const unitTiles = document.querySelectorAll(`#unit-${exId} .tile`);
+
+        // Feedback-Klassen zurücksetzen
+        unitTiles.forEach(t => t.classList.remove('correct', 'incorrect'));
+
+        if (selectedOpt === ex.correct) {
+            tile.classList.add('correct');
+            gap.textContent = ex.stem + ex.correct;
+            gap.style.color = 'var(--success-color)';
+        } else {
+            tile.classList.add('incorrect');
+            gap.textContent = ex.stem + '...';
+            gap.style.color = 'var(--secondary-color)';
+        }
+    }
+
+    function resetAndShuffle() {
+        currentExercises = shuffle([...allExercises]);
+        renderExercises();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showAllSolutions() {
+        currentExercises.forEach(ex => {
+            const gap = document.getElementById(`gap-${ex.id}`);
+            const unitTiles = document.querySelectorAll(`#unit-${ex.id} .tile`);
+            
+            gap.textContent = ex.stem + ex.correct;
+            gap.style.color = 'var(--success-color)';
+            
+            unitTiles.forEach(t => {
+                t.classList.remove('incorrect');
+                if (t.textContent === ex.correct) {
+                    t.classList.add('correct');
+                }
+            });
+        });
+    }
+
+    // Initialer Start
+    window.onload = resetAndShuffle;
+</script>
+
+</body>
+</html>
