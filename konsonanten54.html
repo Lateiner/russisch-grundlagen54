@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matching: Konsonantenwechsel im Russischen</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f5f6fa;
+            --card-bg: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; font-size: 1.8rem; margin-bottom: 10px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 400; font-size: 1.2rem; margin-bottom: 25px; }
+
+        .intro-box {
+            background-color: #f1f9ff;
+            border-left: 6px solid var(--secondary-color);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Pool für die Partizipien */
+        .drag-pool {
+            background: #f8f9fa;
+            border: 2px dashed var(--secondary-color);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 30px;
+            min-height: 80px;
+        }
+
+        .participle-card {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        .participle-card:active { cursor: grabbing; }
+        .participle-card.correct { background-color: var(--success-color) !important; }
+        .participle-card.incorrect { background-color: var(--error-color) !important; }
+
+        /* Matching Tabelle */
+        .matching-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .matching-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .infinitiv-label {
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: right;
+            padding-right: 15px;
+            border-right: 2px solid #eee;
+        }
+
+        .drop-zone {
+            height: 50px;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            transition: background-color 0.2s;
+        }
+
+        .drop-zone.active {
+            background-color: #e3f2fd;
+            border-color: var(--secondary-color);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #bdc3c7; color: #2c3e50; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+        button:hover { opacity: 0.9; }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .matching-row { grid-template-columns: 1fr; gap: 10px; }
+            .infinitiv-label { text-align: center; border-right: none; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Matching: Konsonantenwechsel</h1>
+    <h2>Ordne den Infinitiv dem richtigen Partizip zu</h2>
+
+    <div class="intro-box">
+        Bei vielen Verben auf <strong>-ить</strong> oder <strong>-еть</strong> verändert sich der letzte Konsonant des Stammes, wenn das Partizip Passiv Präteritum gebildet wird. 
+        <br>Beispiel: д &rarr; жд (освободить &rarr; освобождённый).
+        <br>Ziehe die Partizipien aus dem blauen Kasten in das richtige Feld neben dem Infinitiv.
+    </div>
+
+    <!-- Pool der Partizipien -->
+    <div class="drag-pool" id="pool">
+        <!-- Partizipien (werden per JS gemischt) -->
+        <div class="participle-card" draggable="true" id="p1" data-match="v1">купленный</div>
+        <div class="participle-card" draggable="true" id="p2" data-match="v2">приглашённый</div>
+        <div class="participle-card" draggable="true" id="p3" data-match="v3">освобождённый</div>
+        <div class="participle-card" draggable="true" id="p4" data-match="v4">возвращённый</div>
+        <div class="participle-card" draggable="true" id="p5" data-match="v5">переведённый</div>
+        <div class="participle-card" draggable="true" id="p6" data-match="v6">влюблённый</div>
+        <div class="participle-card" draggable="true" id="p7" data-match="v7">выращенный</div>
+        <div class="participle-card" draggable="true" id="p8" data-match="v8">восстановленный</div>
+    </div>
+
+    <!-- Matching Grid -->
+    <div class="matching-grid">
+        <div class="matching-row">
+            <div class="infinitiv-label">купить (п &rarr; пл)</div>
+            <div class="drop-zone" data-id="v1"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">пригласить (с &rarr; ш)</div>
+            <div class="drop-zone" data-id="v2"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">освободить (д &rarr; жд)</div>
+            <div class="drop-zone" data-id="v3"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">возвратить (т &rarr; щ)</div>
+            <div class="drop-zone" data-id="v4"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">перевести (ст &rarr; д/жд)</div>
+            <div class="drop-zone" data-id="v5"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">влюбить (б &rarr; бл)</div>
+            <div class="drop-zone" data-id="v6"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">вырастить (ст &rarr; щ)</div>
+            <div class="drop-zone" data-id="v7"></div>
+        </div>
+        <div class="matching-row">
+            <div class="infinitiv-label">восстановить (в &rarr; вл)</div>
+            <div class="drop-zone" data-id="v8"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-reset" onclick="resetGame()">Zurücksetzen & Mischen</button>
+        <button class="btn-solution" onclick="showSolution()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const pool = document.getElementById('pool');
+    const cards = document.querySelectorAll('.participle-card');
+    const dropZones = document.querySelectorAll('.drop-zone');
+
+    // Drag events
+    cards.forEach(card => {
+        card.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        });
+    });
+
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', e => {
+            e.preventDefault();
+            zone.classList.add('active');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('active');
+        });
+
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('active');
+            const cardId = e.dataTransfer.getData('text/plain');
+            const card = document.getElementById(cardId);
+            
+            const zoneId = zone.getAttribute('data-id');
+            const cardMatchId = card.getAttribute('data-match');
+
+            // Direktes Feedback geben
+            if (zoneId === cardMatchId) {
+                card.classList.add('correct');
+                card.classList.remove('incorrect');
+            } else {
+                card.classList.add('incorrect');
+                card.classList.remove('correct');
+            }
+
+            // In die Zone einfügen (vorherige Karte zurück in den Pool falls vorhanden)
+            if (zone.children.length > 0) {
+                const existingCard = zone.children[0];
+                existingCard.className = 'participle-card';
+                pool.appendChild(existingCard);
+            }
+            zone.appendChild(card);
+        });
+    });
+
+    // Pool ebenfalls als Dropzone zum Zurücklegen
+    pool.addEventListener('dragover', e => e.preventDefault());
+    pool.addEventListener('drop', e => {
+        e.preventDefault();
+        const cardId = e.dataTransfer.getData('text/plain');
+        const card = document.getElementById(cardId);
+        card.className = 'participle-card';
+        pool.appendChild(card);
+    });
+
+    // Mischen-Funktion
+    function shufflePool() {
+        const cardArray = Array.from(pool.children);
+        for (let i = cardArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            pool.appendChild(cardArray[j]);
+        }
+    }
+
+    function resetGame() {
+        cards.forEach(card => {
+            card.className = 'participle-card';
+            pool.appendChild(card);
+        });
+        shufflePool();
+    }
+
+    function showSolution() {
+        cards.forEach(card => {
+            const matchId = card.getAttribute('data-match');
+            const correctZone = document.querySelector(`.drop-zone[data-id="${matchId}"]`);
+            card.classList.add('correct');
+            card.classList.remove('incorrect');
+            correctZone.appendChild(card);
+        });
+    }
+
+    // Initiales Mischen
+    window.onload = shufflePool;
+</script>
+
+</body>
+</html>
