@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fehler-Detektiv: Russische Partizipien</title>
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; color: var(--primary-color); margin-bottom: 10px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 300; margin-bottom: 30px; }
+
+        .intro-box {
+            background-color: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .exercise-card {
+            background: #fff;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .sentence-container {
+            margin-bottom: 15px;
+        }
+
+        .sentence {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            line-height: 1.6;
+            padding: 8px;
+            border-radius: 5px;
+            background: #fdfdfd;
+        }
+
+        .word {
+            display: inline-block;
+            padding: 2px 4px;
+            margin: 0 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px dashed transparent;
+        }
+
+        .word:hover {
+            background-color: #f0f0f0;
+            border-bottom-color: var(--secondary-color);
+        }
+
+        /* Feedback-Klassen */
+        .word.found-error {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .word.wrong-click {
+            background-color: var(--error-color) !important;
+            color: white !important;
+        }
+
+        .word.highlight-solution {
+            outline: 2px solid var(--success-color);
+            background-color: #eafaf1;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            position: sticky;
+            bottom: 20px;
+        }
+
+        button.action-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button.action-btn:active { transform: translateY(2px); }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .sentence { font-size: 1rem; }
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fehler-Detektiv</h1>
+    <h2>Finde das falsch geschriebene Partizip</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> In jeder Gruppe gibt es drei Sätze. In einem Satz ist ein passives Partizip Präteritum **falsch geschrieben**. Klicke direkt auf das Wort, das den Fehler enthält!
+    </div>
+
+    <div id="exercise-container">
+        <!-- Inhalte werden per JS geladen -->
+    </div>
+
+    <div class="controls">
+        <button class="action-btn btn-reset" onclick="resetAndShuffle()">Zurücksetzen und mischen</button>
+        <button class="action-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const allExercises = [
+        {
+            id: 1,
+            sentences: [
+                "Это письмо, написанное братом.",
+                "Работа была сделенна вовремя.", // Fehler: сделенна (richtig: сделана / сделанная)
+                "Мы прочитали купленную книгу."
+            ],
+            errorWord: "сделенна"
+        },
+        {
+            id: 2,
+            sentences: [
+                "Дом, построиный рабочими, очень красивый.", // Fehler: построиный (richtig: построенный)
+                "Все задачи были решены правильно.",
+                "Окно, открытое папой, выходило в сад."
+            ],
+            errorWord: "построиный"
+        },
+        {
+            id: 3,
+            sentences: [
+                "Я видел переведенный текст.",
+                "Цветы были посажены мамой.",
+                "Это была купенная в магазине вещь." // Fehler: купенная (richtig: купленная)
+            ],
+            errorWord: "купенная"
+        },
+        {
+            id: 4,
+            sentences: [
+                "Письмо было получено вчера.",
+                "Забынный на столе ключ нашелся.", // Fehler: Забынный (richtig: Забытый)
+                "Рассказанная история всем понравилась."
+            ],
+            errorWord: "Забынный"
+        },
+        {
+            id: 5,
+            sentences: [
+                "Ошибки, исправленные учителем, исчезли.",
+                "Стихотворение было выученно наизусть.", // Fehler: выученно (Kurzform Neutrum: выучено)
+                "Мы ели приготовленный мамой ужин."
+            ],
+            errorWord: "выученно"
+        },
+        {
+            id: 6,
+            sentences: [
+                "Дверь была закыта на ключ.", // Fehler: закыта (richtig: закрыта)
+                "Увиденный фильм был очень грустным.",
+                "Потерянные деньги не нашли."
+            ],
+            errorWord: "закыта"
+        },
+        {
+            id: 7,
+            sentences: [
+                "Написенная статья была длинной.", // Fehler: Написенная (richtig: Написанная)
+                "Книга, взятая в библиотеке, интересная.",
+                "Все билеты были проданы."
+            ],
+            errorWord: "Написенная"
+        },
+        {
+            id: 8,
+            sentences: [
+                "Окно, разбитое мячом, заменили.",
+                "Прочитаная газета лежала здесь.", // Fehler: Прочитаная (Langform braucht -нн-: прочитанная)
+                "Построенное здание было высоким."
+            ],
+            errorWord: "Прочитаная"
+        },
+        {
+            id: 9,
+            sentences: [
+                "История, услышанная вчера, была странной.",
+                "Работа, законченая в срок, радует.", // Fehler: законченая (richtig: законченная)
+                "Мы подошли к открытому окну."
+            ],
+            errorWord: "законченая"
+        },
+        {
+            id: 10,
+            sentences: [
+                "Завтрак, приготовленый поваром, был вкусным.", // Fehler: приготовленый (Langform braucht -нн-)
+                "Все стихи были написаны поэтом.",
+                "Мы смотрели на посеянное поле."
+            ],
+            errorWord: "приготовленый"
+        }
+    ];
+
+    let currentExercises = [];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    const container = document.getElementById('exercise-container');
+
+    function renderExercises() {
+        container.innerHTML = '';
+        currentExercises.forEach((ex, index) => {
+            const card = document.createElement('div');
+            card.className = 'exercise-card';
+            card.id = `card-${ex.id}`;
+
+            const title = document.createElement('strong');
+            title.textContent = `Aufgabe ${index + 1}:`;
+            card.appendChild(title);
+
+            ex.sentences.forEach(sent => {
+                const sentDiv = document.createElement('div');
+                sentDiv.className = 'sentence';
+                
+                // Zerlege Satz in Wörter, um sie klickbar zu machen
+                const words = sent.split(' ');
+                words.forEach((w, wIdx) => {
+                    const span = document.createElement('span');
+                    span.className = 'word';
+                    // Entferne Satzzeichen für den Vergleich, aber behalte sie für die Anzeige
+                    const cleanWord = w.replace(/[.,!?;:]/g, "");
+                    const cleanError = ex.errorWord.replace(/[.,!?;:]/g, "");
+
+                    span.textContent = w;
+                    span.onclick = () => checkWord(span, cleanWord === cleanError, ex.id);
+                    sentDiv.appendChild(span);
+                    
+                    // Leerzeichen hinzufügen
+                    if (wIdx < words.length - 1) {
+                        sentDiv.appendChild(document.createTextNode(' '));
+                    }
+                });
+                card.appendChild(sentDiv);
+            });
+            container.appendChild(card);
+        });
+    }
+
+    function checkWord(element, isError, exId) {
+        // Verhindere mehrfaches Klicken in einer bereits gelösten Karte (optional)
+        // Hier lassen wir es zu, falls man sich vertippt hat.
+
+        if (isError) {
+            element.classList.add('found-error');
+            element.classList.remove('wrong-click');
+        } else {
+            element.classList.add('wrong-click');
+            // Nach 1 Sekunde Rot entfernen
+            setTimeout(() => element.classList.remove('wrong-click'), 1000);
+        }
+    }
+
+    function resetAndShuffle() {
+        currentExercises = shuffle([...allExercises]);
+        renderExercises();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showAllSolutions() {
+        currentExercises.forEach(ex => {
+            const card = document.getElementById(`card-${ex.id}`);
+            const words = card.querySelectorAll('.word');
+            const cleanError = ex.errorWord.replace(/[.,!?;:]/g, "");
+
+            words.forEach(w => {
+                const cleanW = w.textContent.replace(/[.,!?;:]/g, "");
+                if (cleanW === cleanError) {
+                    w.classList.add('found-error');
+                } else {
+                    w.classList.remove('found-error', 'wrong-click');
+                }
+            });
+        });
+    }
+
+    window.onload = resetAndShuffle;
+</script>
+
+</body>
+</html>
