@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urheber-Zuweisung: Instrumental im Passiv</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; color: var(--primary-color); font-size: 1.8rem; margin-bottom: 10px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 300; font-size: 1.2rem; margin-bottom: 25px; }
+
+        .intro-box {
+            background-color: #e3f2fd;
+            border-left: 6px solid var(--secondary-color);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Pool für die Urheber */
+        .drag-pool {
+            background: #f1f2f6;
+            border: 2px dashed var(--secondary-color);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            min-height: 100px;
+        }
+
+        .agent-card {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .agent-card:active { cursor: grabbing; transform: scale(0.95); }
+        .agent-card.correct { background-color: var(--success-color) !important; }
+        .agent-card.incorrect { background-color: var(--error-color) !important; }
+
+        /* Übungsliste */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .drop-zone {
+            display: inline-flex;
+            min-width: 140px;
+            height: 35px;
+            border-bottom: 2px solid var(--secondary-color);
+            margin: 0 10px;
+            align-items: center;
+            justify-content: center;
+            background: #fdfdfd;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .drop-zone.active {
+            background-color: #e1f5fe;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            position: sticky;
+            bottom: 20px;
+        }
+
+        button.action-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .exercise-item { font-size: 1rem; flex-direction: column; text-align: center; }
+            .drop-zone { margin: 10px 0; width: 100%; }
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Urheber-Zuweisung</h1>
+    <h2>Wer hat es getan? (Instrumental-Check)</h2>
+
+    <div class="intro-box">
+        Im russischen Passiv steht der Urheber der Handlung im <strong>Instrumental (Fall 5)</strong>.
+        <br>Beispiel: Книга, прочитанная <strong>сестрой</strong> (Das von der Schwester gelesene Buch).
+        <br><br>Ziehe den passenden Urheber in der richtigen Instrumental-Form in die Lücke!
+    </div>
+
+    <!-- Pool der Urheber -->
+    <div class="drag-pool" id="pool">
+        <!-- Inhalte werden per JS geladen und gemischt -->
+    </div>
+
+    <!-- Liste der Sätze -->
+    <div class="exercise-list" id="exercise-list">
+        <!-- Inhalte werden per JS geladen -->
+    </div>
+
+    <div class="controls">
+        <button class="action-btn btn-reset" onclick="resetAndShuffle()">Zurücksetzen und mischen</button>
+        <button class="action-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { id: 1, sentence: "Книга, прочитанная", agent: "сестрой", hint: "(сестра)" },
+        { id: 2, sentence: "Дом, построенный", agent: "рабочими", hint: "(рабочие)" },
+        { id: 3, sentence: "Текст, переведённый", agent: "студентом", hint: "(студент)" },
+        { id: 4, sentence: "Письмо, написанное", agent: "другом", hint: "(друг)" },
+        { id: 5, sentence: "Окно, открытое", agent: "папой", hint: "(папа)" },
+        { id: 6, sentence: "Завтрак, приготовленный", agent: "поваром", hint: "(повар)" },
+        { id: 7, sentence: "Песня, спетая", agent: "певицей", hint: "(певица)" },
+        { id: 8, sentence: "Задачи, решённые", agent: "учениками", hint: "(ученики)" },
+        { id: 9, sentence: "Картина, написанная", agent: "художником", hint: "(художник)" },
+        { id: 10, sentence: "Ошибка, исправленная", agent: "учителем", hint: "(учитель)" },
+        { id: 11, sentence: "Цветы, посаженные", agent: "бабушкой", hint: "(бабушка)" },
+        { id: 12, sentence: "Работа, сделанная", agent: "мастером", hint: "(мастер)" },
+        { id: 13, sentence: "Проект, выполненный", agent: "инженером", hint: "(инженер)" },
+        { id: 14, sentence: "Фильм, увиденный", agent: "зрителями", hint: "(зрители)" },
+        { id: 15, sentence: "История, рассказанная", agent: "дедушкой", hint: "(дедушка)" },
+        { id: 16, sentence: "Подарок, купленный", agent: "родителями", hint: "(родители)" },
+        { id: 17, sentence: "Поле, посеянное", agent: "фермером", hint: "(фермер)" },
+        { id: 18, sentence: "Стихотворение, выученное", agent: "школьником", hint: "(школьник)" },
+        { id: 19, sentence: "Упражнение, проверенное", agent: "профессором", hint: "(профессор)" },
+        { id: 20, sentence: "Статья, опубликованная", agent: "журналистом", hint: "(журналист)" }
+    ];
+
+    const pool = document.getElementById('pool');
+    const list = document.getElementById('exercise-list');
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function init() {
+        pool.innerHTML = '';
+        list.innerHTML = '';
+
+        // Mische Agenten für den Pool
+        const shuffledAgents = shuffle(data.map(item => ({ id: item.id, agent: item.agent })));
+        
+        shuffledAgents.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'agent-card';
+            card.draggable = true;
+            card.id = `agent-${item.id}`;
+            card.textContent = item.agent;
+            card.dataset.id = item.id;
+            card.addEventListener('dragstart', handleDragStart);
+            pool.appendChild(card);
+        });
+
+        // Mische Sätze für die Liste
+        const shuffledExercises = shuffle([...data]);
+        shuffledExercises.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'exercise-item';
+            div.innerHTML = `
+                <span>${index + 1}. ${item.sentence}</span>
+                <div class="drop-zone" data-id="${item.id}" id="zone-${item.id}"></div>
+                <span style="color: #7f8c8d; font-size: 0.9rem;">${item.hint}</span>
+            `;
+            const zone = div.querySelector('.drop-zone');
+            zone.addEventListener('dragover', handleDragOver);
+            zone.addEventListener('dragleave', handleDragLeave);
+            zone.addEventListener('drop', handleDrop);
+            list.appendChild(div);
+        });
+    }
+
+    function handleDragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.id);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('active');
+    }
+
+    function handleDragLeave(e) {
+        e.currentTarget.classList.remove('active');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const zone = e.currentTarget;
+        zone.classList.remove('active');
+        
+        const cardId = e.dataTransfer.setData ? e.dataTransfer.getData('text/plain') : window.draggedId;
+        const card = document.getElementById(cardId);
+        
+        const zoneId = zone.dataset.id;
+        const cardIdRef = card.dataset.id;
+
+        // Feedback
+        if (zoneId === cardIdRef) {
+            card.className = 'agent-card correct';
+        } else {
+            card.className = 'agent-card incorrect';
+        }
+
+        // Falls schon etwas in der Zone liegt, zurück in den Pool
+        if (zone.children.length > 0) {
+            const oldCard = zone.children[0];
+            oldCard.className = 'agent-card';
+            pool.appendChild(oldCard);
+        }
+
+        zone.appendChild(card);
+    }
+
+    // Für Touch-Geräte Support via Polyfill
+    pool.addEventListener('dragover', e => e.preventDefault());
+    pool.addEventListener('drop', e => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        const card = document.getElementById(id);
+        card.className = 'agent-card';
+        pool.appendChild(card);
+    });
+
+    function resetAndShuffle() {
+        init();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showAllSolutions() {
+        data.forEach(item => {
+            const zone = document.getElementById(`zone-${item.id}`);
+            const card = document.getElementById(`agent-${item.id}`);
+            
+            card.className = 'agent-card correct';
+            zone.innerHTML = '';
+            zone.appendChild(card);
+        });
+    }
+
+    // Initialer Start
+    window.onload = init;
+</script>
+
+</body>
+</html>
