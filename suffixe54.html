@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suffix-Sortiermaschine: Russische Partizipien</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --nn-color: #9b59b6;
+            --enn-color: #e67e22;
+            --t-color: #16a085;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; font-size: 1.8rem; margin-bottom: 5px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 400; font-size: 1.2rem; margin-bottom: 20px; }
+
+        .intro-box {
+            background-color: #f1f7ff;
+            border-left: 5px solid var(--secondary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Karten-Pool */
+        .source-pool {
+            background: #dfe6e9;
+            padding: 20px;
+            border-radius: 12px;
+            min-height: 120px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 35px;
+            border: 2px dashed #b2bec3;
+        }
+
+        .verb-card {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .verb-card:active { cursor: grabbing; transform: scale(0.95); }
+        .verb-card.correct { background-color: var(--success-color) !important; }
+        .verb-card.incorrect { background-color: var(--error-color) !important; }
+
+        /* Sortier-Zonen (Eimer) */
+        .bucket-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .bucket {
+            min-height: 180px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 3px solid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+        }
+
+        .bucket[data-suffix="nn"] { border-color: var(--nn-color); }
+        .bucket[data-suffix="enn"] { border-color: var(--enn-color); }
+        .bucket[data-suffix="t"] { border-color: var(--t-color); }
+
+        .bucket-label {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .bucket[data-suffix="nn"] .bucket-label { background: var(--nn-color); }
+        .bucket[data-suffix="enn"] .bucket-label { background: var(--enn-color); }
+        .bucket[data-suffix="t"] .bucket-label { background: var(--t-color); }
+
+        .bucket-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-content: flex-start;
+        }
+
+        .hint { font-size: 0.75rem; color: #636e72; margin-top: 8px; font-style: italic; }
+
+        /* Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #bdc3c7; color: #2c3e50; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+        button:hover { opacity: 0.9; }
+
+        @media (max-width: 768px) {
+            .bucket-container { grid-template-columns: 1fr; }
+            .bucket { min-height: 120px; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Suffix-Sortiermaschine</h1>
+    <h2>Klassifizierung der Infinitive</h2>
+
+    <div class="intro-box">
+        Wähle ein Verb aus dem Pool und ziehe es in den richtigen „Eimer“. Die Farbe zeigt dir sofort, ob deine Entscheidung richtig war.
+        <br><strong>Regel:</strong> -нн- (-ать/-ять), -енн- (-ить/-еть/-ти), -т- (kurze Verben).
+    </div>
+
+    <!-- Karten-Pool -->
+    <div class="source-pool" id="main-pool">
+        <!-- Gemischte Verben als Startinhalt -->
+        <div class="verb-card" draggable="true" id="v1" data-suffix="nn">написать</div>
+        <div class="verb-card" draggable="true" id="v2" data-suffix="enn">купить</div>
+        <div class="verb-card" draggable="true" id="v3" data-suffix="t">забыть</div>
+        <div class="verb-card" draggable="true" id="v4" data-suffix="nn">прочитать</div>
+        <div class="verb-card" draggable="true" id="v5" data-suffix="enn">решить</div>
+        <div class="verb-card" draggable="true" id="v6" data-suffix="t">открыть</div>
+        <div class="verb-card" draggable="true" id="v7" data-suffix="nn">сделать</div>
+        <div class="verb-card" draggable="true" id="v8" data-suffix="enn">построить</div>
+        <div class="verb-card" draggable="true" id="v9" data-suffix="t">взять</div>
+        <div class="verb-card" draggable="true" id="v10" data-suffix="nn">потерять</div>
+        <div class="verb-card" draggable="true" id="v11" data-suffix="enn">перевести</div>
+        <div class="verb-card" draggable="true" id="v12" data-suffix="t">убить</div>
+        <div class="verb-card" draggable="true" id="v13" data-suffix="nn">рассказать</div>
+        <div class="verb-card" draggable="true" id="v14" data-suffix="enn">получить</div>
+        <div class="verb-card" draggable="true" id="v15" data-suffix="t">закрыть</div>
+        <div class="verb-card" draggable="true" id="v16" data-suffix="enn">увидеть</div>
+        <div class="verb-card" draggable="true" id="v17" data-suffix="t">вымыть</div>
+        <div class="verb-card" draggable="true" id="v18" data-suffix="nn">посеять</div>
+    </div>
+
+    <!-- Eimer-Bereich -->
+    <div class="bucket-container">
+        <div class="bucket" data-suffix="nn">
+            <div class="bucket-label">-нн-</div>
+            <div class="bucket-content" id="zone-nn"></div>
+            <div class="hint">(-ать, -ять)</div>
+        </div>
+
+        <div class="bucket" data-suffix="enn">
+            <div class="bucket-label">-енн- / -ённ-</div>
+            <div class="bucket-content" id="zone-enn"></div>
+            <div class="hint">(-ить, -еть, -ти)</div>
+        </div>
+
+        <div class="bucket" data-suffix="t">
+            <div class="bucket-label">-т-</div>
+            <div class="bucket-content" id="zone-t"></div>
+            <div class="hint">(kurze Verben)</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-reset" onclick="resetMachine()">Zurücksetzen & Mischen</button>
+        <button class="btn-solution" onclick="showSolution()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const pool = document.getElementById('main-pool');
+    const cards = document.querySelectorAll('.verb-card');
+    const bucketContents = document.querySelectorAll('.bucket-content');
+
+    // Drag & Drop Event-Handler
+    cards.forEach(card => {
+        card.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        });
+    });
+
+    bucketContents.forEach(zone => {
+        zone.addEventListener('dragover', e => e.preventDefault());
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const draggedCard = document.getElementById(id);
+            const bucketType = zone.parentElement.getAttribute('data-suffix');
+            const cardType = draggedCard.getAttribute('data-suffix');
+
+            // Sofortiges Feedback
+            if (bucketType === cardType) {
+                draggedCard.classList.add('correct');
+                draggedCard.classList.remove('incorrect');
+            } else {
+                draggedCard.classList.add('incorrect');
+                draggedCard.classList.remove('correct');
+            }
+            zone.appendChild(draggedCard);
+        });
+    });
+
+    // Pool ebenfalls als Dropzone zum Zurücklegen
+    pool.addEventListener('dragover', e => e.preventDefault());
+    pool.addEventListener('drop', e => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        const draggedCard = document.getElementById(id);
+        draggedCard.className = 'verb-card'; // Feedback entfernen
+        pool.appendChild(draggedCard);
+    });
+
+    // Shuffle-Funktion (Fisher-Yates Algorithmus für DOM-Elemente)
+    function shuffleCards() {
+        const cardArray = Array.from(pool.children);
+        for (let i = cardArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            pool.appendChild(cardArray[j]);
+        }
+    }
+
+    function resetMachine() {
+        cards.forEach(card => {
+            card.className = 'verb-card';
+            pool.appendChild(card);
+        });
+        shuffleCards();
+    }
+
+    function showSolution() {
+        cards.forEach(card => {
+            const type = card.getAttribute('data-suffix');
+            const targetZone = document.getElementById('zone-' + type);
+            card.className = 'verb-card correct';
+            targetZone.appendChild(card);
+        });
+    }
+
+    // Initiales Mischen beim Laden
+    window.onload = shuffleCards;
+</script>
+
+</body>
+</html>
