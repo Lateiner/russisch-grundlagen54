@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformation: Relativsatz zu Partizip</title>
+    <!-- Polyfill für Touch-Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .intro-box {
+            background-color: #e3f2fd;
+            border-left: 6px solid var(--secondary-color);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        h1 { margin-bottom: 10px; color: var(--primary-color); }
+        h3 { margin-top: 0; color: var(--secondary-color); }
+
+        .exercise-unit {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            margin-bottom: 10px;
+        }
+
+        .exercise-unit:last-child { border-bottom: none; }
+
+        .sentence-box {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        /* Interaktive Elemente */
+        select {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: white;
+            margin: 0 5px;
+        }
+
+        select.correct { border-color: var(--success-color); background-color: #e8f5e9; }
+        select.incorrect { border-color: var(--error-color); background-color: #ffebee; }
+
+        /* Drag & Drop */
+        .drag-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+            min-height: 60px;
+            padding: 15px;
+            background: #fdfdfd;
+            border-radius: 8px;
+            border: 2px dashed var(--secondary-color);
+            justify-content: center;
+        }
+
+        .drag-item {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: grab;
+            font-size: 1rem;
+            user-select: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .drag-item.correct { background-color: var(--success-color) !important; }
+        .drag-item.incorrect { background-color: var(--error-color) !important; }
+
+        .drop-zone {
+            display: inline-block;
+            min-width: 140px;
+            border-bottom: 2px solid var(--secondary-color);
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            padding: 2px 10px;
+            background: #fafafa;
+            border-radius: 4px;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-reset { background-color: #f1f2f6; color: #57606f; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 12px;
+            margin: 8px 0;
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .choice-btn.correct { border-color: var(--success-color); background: #e8f5e9; }
+        .choice-btn.incorrect { border-color: var(--error-color); background: #ffebee; }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .card { padding: 20px; }
+            select { width: 100%; margin: 10px 0; }
+            .drop-zone { display: block; margin: 10px auto; width: 80%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="header-section">
+        <h1>Russische Grammatik: Transformation</h1>
+        <h3>Vom Relativsatz zum Partizipialattribut</h3>
+    </div>
+
+    <div class="card intro-box">
+        <strong>Anleitung:</strong> Wandle den Satz mit „который“ in einen Satz mit einem Partizip um. 
+        Achte auf die Endung des Partizips (m, f, n oder Plural).
+        <br><br>
+        <em>Beispiel:</em> Письмо, которое написали &rarr; Письмо, <strong>написанное</strong> Антоном.
+    </div>
+
+    <!-- TEIL 1 -->
+    <div class="card">
+        <h3>Teil 1: Wähle das richtige Partizip</h3>
+        
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                1. Письмо, которое написали друзья.<br>
+                &rarr; Письмо, <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">написанный</option>
+                    <option value="correct">написанное</option>
+                    <option value="wrong">написанная</option>
+                </select> друзьями.
+            </div>
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetUnit(this)">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showSolution(this, 'написанное')">Lösung</button>
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                2. Дом, который построили рабочие.<br>
+                &rarr; Дом, <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="correct">построенный</option>
+                    <option value="wrong">построенное</option>
+                    <option value="wrong">построеный</option>
+                </select> рабочими.
+            </div>
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetUnit(this)">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showSolution(this, 'построенный')">Lösung</button>
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                3. Книга, которую прочитала сестра.<br>
+                &rarr; Книга, <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">прочитанный</option>
+                    <option value="correct">прочитанная</option>
+                    <option value="wrong">прочитанную</option>
+                </select> сестрой.
+            </div>
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetUnit(this)">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showSolution(this, 'прочитанная')">Lösung</button>
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                4. Задачи, которые решили ученики.<br>
+                &rarr; Задачи, <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">решенные</option>
+                    <option value="correct">решённые</option>
+                    <option value="wrong">решённая</option>
+                </select> учениками.
+            </div>
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetUnit(this)">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showSolution(this, 'решённые')">Lösung</button>
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                5. Песня, которую спела Ира.<br>
+                &rarr; Песня, <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">спетый</option>
+                    <option value="correct">спетая</option>
+                    <option value="wrong">спетые</option>
+                </select> Ирой.
+            </div>
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetUnit(this)">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showSolution(this, 'спетая')">Lösung</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEIL 2 (ANGEPASST: MISCHUNG) -->
+    <div class="card">
+        <h3>Teil 2: Drag & Drop (Gemischte Lösungen)</h3>
+        <p>Ziehe die Partizipien in die richtigen Sätze. Die Wörter unten sind gemischt.</p>
+        
+        <div id="drag-block">
+            <!-- Gemischter Pool -->
+            <div class="drag-pool" id="pool2">
+                <div class="drag-item" draggable="true" id="dr-ku" data-ans="купленный">купленный</div>
+                <div class="drag-item" draggable="true" id="dr-za" data-ans="забытые">забытые</div>
+                <div class="drag-item" draggable="true" id="dr-sd" data-ans="сделанная">сделанная</div>
+                <div class="drag-item" draggable="true" id="dr-ot" data-ans="открытое">открытое</div>
+                <div class="drag-item" draggable="true" id="dr-uv" data-ans="увиденный">увиденный</div>
+                <div class="drag-item" draggable="true" id="dr-pe" data-ans="переведённый">переведённый</div>
+            </div>
+
+            <div class="exercise-unit">
+                <div class="sentence-box">6. Окно, которое открыл папа. &rarr; <span class="drop-zone" data-correct="открытое"></span> папой окно.</div>
+                <div class="sentence-box">7. Билеты, которые мы забыли. &rarr; <span class="drop-zone" data-correct="забытые"></span> нами билеты.</div>
+                <div class="sentence-box">8. Журнал, который купил брат. &rarr; <span class="drop-zone" data-correct="купленный"></span> братом журнал.</div>
+                <div class="sentence-box">9. Текст, который перевёл студент. &rarr; <span class="drop-zone" data-correct="переведённый"></span> студентом текст.</div>
+                <div class="sentence-box">10. Фильм, который мы увидели. &rarr; <span class="drop-zone" data-correct="увиденный"></span> нами фильм.</div>
+                <div class="sentence-box">11. Работа, которую сделала мама. &rarr; <span class="drop-zone" data-correct="сделанная"></span> мамой работа.</div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetDragBlock()">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showDragBlockSolution()">Lösung</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEIL 3 -->
+    <div class="card">
+        <h3>Teil 3: Wähle die beste Umwandlung</h3>
+        
+        <div class="exercise-unit">
+            <p>12. „Завтрак, который приготовил повар.“</p>
+            <button class="choice-btn" onclick="checkChoice(this, false)">Завтрак, приготовленная поваром.</button>
+            <button class="choice-btn" onclick="checkChoice(this, true)">Завтрак, приготовленный поваром.</button>
+        </div>
+
+        <div class="exercise-unit">
+            <p>13. „Ошибки, которые исправил учитель.“</p>
+            <button class="choice-btn" onclick="checkChoice(this, true)">Ошибки, исправленные учителем.</button>
+            <button class="choice-btn" onclick="checkChoice(this, false)">Ошибки, исправленная учителем.</button>
+        </div>
+
+        <div class="exercise-unit">
+            <p>14. „Город, который основал царь.“</p>
+            <button class="choice-btn" onclick="checkChoice(this, true)">Город, основанный царём.</button>
+            <button class="choice-btn" onclick="checkChoice(this, false)">Город, основанную царём.</button>
+        </div>
+
+        <div class="exercise-unit">
+            <p>15. „История, которую рассказала бабушка.“</p>
+            <button class="choice-btn" onclick="checkChoice(this, true)">История, рассказанная бабушкой.</button>
+            <button class="choice-btn" onclick="checkChoice(this, false)">История, рассказанное бабушкой.</button>
+        </div>
+    </div>
+
+    <!-- TEIL 4 -->
+    <div class="card">
+        <h3>Teil 4: Kasus-Check</h3>
+        
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                16. Я читаю статью, которую написала Ира.<br>
+                &rarr; Я читаю статью, <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="correct">написанную</option>
+                    <option value="wrong">написанная</option>
+                    <option value="wrong">написанной</option>
+                </select> Ирой.
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                17. Мы подошли к дому, который построили в прошлом году.<br>
+                &rarr; Мы подошли к <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">построенный</option>
+                    <option value="correct">построенному</option>
+                    <option value="wrong">построенным</option>
+                </select> в прошлом году дому.
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                18. В книге нет ответа, который мы нашли вчера.<br>
+                &rarr; В книге нет <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">найденный</option>
+                    <option value="correct">найденного</option>
+                    <option value="wrong">найденному</option>
+                </select> вчера ответа.
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                19. Он гордится проектом, который сделал сам.<br>
+                &rarr; Он гордится <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">сделанный</option>
+                    <option value="correct">сделанным</option>
+                    <option value="wrong">сделанного</option>
+                </select> им проектом.
+            </div>
+        </div>
+
+        <div class="exercise-unit">
+            <div class="sentence-box">
+                20. Мы любуемся картиной, которую купили на выставке.<br>
+                &rarr; Мы любуемся <select onchange="instantCheck(this)">
+                    <option value="">--?--</option>
+                    <option value="wrong">купленная</option>
+                    <option value="wrong">купленную</option>
+                    <option value="correct">купленной</option>
+                </select> на выставke картиной.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sofort-Check für Dropdowns
+    function instantCheck(selectEl) {
+        if (selectEl.value === 'correct') {
+            selectEl.className = 'correct';
+        } else if (selectEl.value === 'wrong') {
+            selectEl.className = 'incorrect';
+        } else {
+            selectEl.className = '';
+        }
+    }
+
+    function resetUnit(btn) {
+        const unit = btn.closest('.exercise-unit');
+        const selects = unit.querySelectorAll('select');
+        selects.forEach(s => { s.value = ""; s.className = ""; });
+    }
+
+    function showSolution(btn, correctVal) {
+        const unit = btn.closest('.exercise-unit');
+        const select = unit.querySelector('select');
+        select.value = 'correct';
+        select.className = 'correct';
+    }
+
+    function checkChoice(btn, isCorrect) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.choice-btn').forEach(b => b.className = 'choice-btn');
+        btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+    }
+
+    // DRAG AND DROP LOGIK
+    const dragItems = document.querySelectorAll('.drag-item');
+    const dropZones = document.querySelectorAll('.drop-zone');
+
+    dragItems.forEach(item => {
+        item.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        });
+    });
+
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', e => e.preventDefault());
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text');
+            const dragged = document.getElementById(id);
+            const correctValue = zone.getAttribute('data-correct');
+            const itemValue = dragged.getAttribute('data-ans');
+
+            if (itemValue === correctValue) {
+                dragged.classList.add('correct');
+                dragged.classList.remove('incorrect');
+            } else {
+                dragged.classList.add('incorrect');
+                dragged.classList.remove('correct');
+            }
+            
+            zone.innerHTML = "";
+            zone.appendChild(dragged);
+        });
+    });
+
+    function resetDragBlock() {
+        const pool = document.getElementById('pool2');
+        const items = document.querySelectorAll('#drag-block .drag-item');
+        const zones = document.querySelectorAll('#drag-block .drop-zone');
+        
+        zones.forEach(z => z.innerHTML = "");
+        items.forEach(item => {
+            item.className = 'drag-item';
+            pool.appendChild(item);
+        });
+    }
+
+    function showDragBlockSolution() {
+        const zones = document.querySelectorAll('#drag-block .drop-zone');
+        const items = document.querySelectorAll('#drag-block .drag-item');
+
+        zones.forEach(zone => {
+            const correct = zone.getAttribute('data-correct');
+            items.forEach(item => {
+                if (item.getAttribute('data-ans') === correct) {
+                    item.className = 'drag-item correct';
+                    zone.innerHTML = "";
+                    zone.appendChild(item);
+                }
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
