@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktives Arbeitsblatt: Passives Partizip Präteritum</title>
+    <!-- Polyfill für Touch-Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1 { text-align: center; color: var(--primary-color); margin-bottom: 10px; }
+        h2 { text-align: center; color: var(--secondary-color); font-weight: 300; margin-bottom: 30px; }
+
+        .intro-box {
+            background-color: #f1f7fe;
+            padding: 25px;
+            border-left: 6px solid var(--secondary-color);
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        .exercise-card {
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .exercise-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--secondary-color);
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-reset { background-color: #ecf0f1; color: #7f8c8d; }
+        .btn-reset:hover { background-color: #bdc3c7; }
+        .btn-solution { background-color: var(--secondary-color); color: white; }
+        .btn-solution:hover { opacity: 0.9; }
+
+        /* Direkte Feedback-Styles */
+        select {
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.3s, background-color 0.3s;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        select.correct {
+            border-color: var(--success-color) !important;
+            background-color: #eafaf1;
+        }
+
+        select.incorrect {
+            border-color: var(--error-color) !important;
+            background-color: #fdedec;
+        }
+
+        /* Drag and Drop Styles */
+        .drag-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            min-height: 50px;
+        }
+
+        .drag-item {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.9rem;
+        }
+
+        .drag-item.correct { background-color: var(--success-color) !important; }
+        .drag-item.incorrect { background-color: var(--error-color) !important; }
+
+        .drop-zone-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .drop-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 80px;
+            text-align: center;
+        }
+
+        .drop-label { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 5px; display: block; }
+
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 12px 5px; border-bottom: 1px solid #eee; }
+
+        @media (max-width: 768px) {
+            .drop-zone-container { grid-template-columns: 1fr; }
+            .container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Passives Partizip Präteritum</h2>
+
+    <div class="intro-box">
+        <p>Das passive Partizip Präteritum beschreibt eine Handlung, die an einem Objekt bereits abgeschlossen wurde (z.B. „das gelesene Buch“). Es wird nur von <strong>vollendeten (СВ)</strong>, transitiven Verben gebildet.</p>
+        <p><strong>Wichtige Suffixe:</strong></p>
+        <ul>
+            <li><strong>-нн-</strong> (bei Verben auf -ать / -ять) &rarr; прочитать &rarr; прочитанный</li>
+            <li><strong>-енн- / -ённ-</strong> (bei Verben auf -ить / -еть / -ти) &rarr; построить &rarr; построенный</li>
+            <li><strong>-т-</strong> (bei bestimmten kurzen Verben oder auf -ыть/-нуть) &rarr; открыть &rarr; открытый</li>
+        </ul>
+    </div>
+
+    <!-- START EXERCISES -->
+
+    <!-- Aufgabe 1 -->
+    <div class="exercise-card">
+        <span class="exercise-header">1. Suffix-Zuordnung: Ziehe die Verben in die richtige Box.</span>
+        <div class="drag-pool" id="pool1">
+            <div class="drag-item" draggable="true" id="d1" data-ans="nn">сделать</div>
+            <div class="drag-item" draggable="true" id="d2" data-ans="enn">купить</div>
+            <div class="drag-item" draggable="true" id="d3" data-ans="t">забыть</div>
+            <div class="drag-item" draggable="true" id="d4" data-ans="nn">потерять</div>
+        </div>
+        <div class="drop-zone-container">
+            <div class="drop-box" data-zone="nn"><span class="drop-label">-нн-</span></div>
+            <div class="drop-box" data-zone="enn"><span class="drop-label">-енн- / -ённ-</span></div>
+            <div class="drop-box" data-zone="t"><span class="drop-label">-т-</span></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetDrag(1)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showDragSolution(1)">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 2 -->
+    <div class="exercise-card">
+        <span class="exercise-header">2. Was ist die korrekte Form von „построить“ (bauen)?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">построянный</option>
+            <option value="correct">построенный</option>
+            <option value="wrong">построитый</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'построенный')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 3 -->
+    <div class="exercise-card">
+        <span class="exercise-header">3. Wähle die korrekte Form von „решить“ (lösen) mit Betonung:</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">решенный</option>
+            <option value="correct">решённый</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'решённый')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 4 -->
+    <div class="exercise-card">
+        <span class="exercise-header">4. Bilde das Partizip von „написать“ für ein neutrales Nomen (письмо):</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">написанный</option>
+            <option value="correct">написанное</option>
+            <option value="wrong">написанная</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'написанное')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 5 -->
+    <div class="exercise-card">
+        <span class="exercise-header">5. Welches Verb nutzt das Suffix -т-?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">увидеть</option>
+            <option value="wrong">получить</option>
+            <option value="correct">закрыть</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'закрыть')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 6 -->
+    <div class="exercise-card">
+        <span class="exercise-header">6. „Купленная книга“ – Welches Verb ist die Basis?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">покупать</option>
+            <option value="correct">купить</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'купить')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 7 -->
+    <div class="exercise-card">
+        <span class="exercise-header">7. Akkusativ Feminin: Ich sehe die geöffnete Tür (открытая дверь).</span>
+        <p>Я вижу ... дверь.</p>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">открытая</option>
+            <option value="correct">открытую</option>
+            <option value="wrong">открытой</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'открытую')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 8 -->
+    <div class="exercise-card">
+        <span class="exercise-header">8. Genitiv Singular (m): Des gekauften Hauses (купленный дом).</span>
+        <p>Для ... дома.</p>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">купленный</option>
+            <option value="correct">купленного</option>
+            <option value="wrong">купленному</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'купленного')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 9 -->
+    <div class="exercise-card">
+        <span class="exercise-header">9. Instrumental (m) – Urheber: „Ein von Anton geschriebener Text“.</span>
+        <p>Текст, написанный ... .</p>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">Антон</option>
+            <option value="wrong">Антона</option>
+            <option value="correct">Антоном</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'Антоном')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 10 -->
+    <div class="exercise-card">
+        <span class="exercise-header">10. Plural Nominativ: Die vergessenen Sachen (вещи).</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="correct">забытые вещи</option>
+            <option value="wrong">забытая вещи</option>
+            <option value="wrong">забытый вещи</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'забытые вещи')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 11 -->
+    <div class="exercise-card">
+        <span class="exercise-header">11. Bedeutung: Was bedeutet „сделанная работа“?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="correct">getane Arbeit</option>
+            <option value="wrong">machende Arbeit</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'getane Arbeit')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 12 -->
+    <div class="exercise-card">
+        <span class="exercise-header">12. Kommasetzung: Welcher Satz ist korrekt?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="correct">Книга, купленная вчера, лежит здесь.</option>
+            <option value="wrong">Книга купленная вчера лежит здесь.</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'Книга, купленная вчера, liegt здесь.')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 13 -->
+    <div class="exercise-card">
+        <span class="exercise-header">13. Was passiert bei „перевести“ (übersetzen)?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">перевесенный</option>
+            <option value="correct">переведённый</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'переведённый')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 14 -->
+    <div class="exercise-card">
+        <span class="exercise-header">14. Passiv oder Aktiv? „прочитавший мальчик“.</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="correct">Aktiv</option>
+            <option value="wrong">Passiv</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'Aktiv')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 15 -->
+    <div class="exercise-card">
+        <span class="exercise-header">15. Passiv oder Aktiv? „прочитанная книга“.</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">Aktiv</option>
+            <option value="correct">Passiv</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'Passiv')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 16 -->
+    <div class="exercise-card">
+        <span class="exercise-header">16. Form von „взять“ (nehmen):</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="correct">взятый</option>
+            <option value="wrong">взянный</option>
+            <option value="wrong">взяенный</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'взятый')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 17 -->
+    <div class="exercise-card">
+        <span class="exercise-header">17. Dativ Plural: „Zu den erhaltenen Briefen“.</span>
+        <p>К ... письмам.</p>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">полученным</option>
+            <option value="correct">полученным</option>
+            <option value="wrong">полученных</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'полученным')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 18 -->
+    <div class="exercise-card">
+        <span class="exercise-header">18. Präpositiv (f): „In der geöffneten Tasche“.</span>
+        <p>В ... сумке.</p>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">открытую</option>
+            <option value="correct">открытой</option>
+            <option value="wrong">открытая</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'открытой')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 19 -->
+    <div class="exercise-card">
+        <span class="exercise-header">19. Welches Verb ist KEIN passives Partizip?</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="correct">читающий</option>
+            <option value="wrong">увиденный</option>
+            <option value="wrong">открытый</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'читающий')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- Aufgabe 20 -->
+    <div class="exercise-card">
+        <span class="exercise-header">20. „Das beendete Lied“ (песня, f.):</span>
+        <select onchange="instantCheck(this)">
+            <option value="">--Bitte wählen--</option>
+            <option value="wrong">спетый песня</option>
+            <option value="correct">спетая песня</option>
+            <option value="wrong">спетое песня</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-reset" onclick="resetSelect(this)">Zurücksetzen</button>
+            <button class="btn-solution" onclick="showSelectSolution(this, 'спетая песня')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Logik für Dropdown-Menüs ---
+    function instantCheck(selectElement) {
+        if (selectElement.value === 'correct') {
+            selectElement.className = 'correct';
+        } else if (selectElement.value === 'wrong') {
+            selectElement.className = 'incorrect';
+        } else {
+            selectElement.className = '';
+        }
+    }
+
+    function resetSelect(btn) {
+        const select = btn.closest('.exercise-card').querySelector('select');
+        select.value = "";
+        select.className = "";
+    }
+
+    function showSelectSolution(btn, correctText) {
+        const select = btn.closest('.exercise-card').querySelector('select');
+        // Suche die Option mit dem richtigen Text oder Wert
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === 'correct' || select.options[i].text === correctText) {
+                select.selectedIndex = i;
+                break;
+            }
+        }
+        select.className = 'correct';
+    }
+
+    // --- Logik für Drag and Drop ---
+    const dragItems = document.querySelectorAll('.drag-item');
+    const dropBoxes = document.querySelectorAll('.drop-box');
+
+    dragItems.forEach(item => {
+        item.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        });
+    });
+
+    dropBoxes.forEach(box => {
+        box.addEventListener('dragover', e => e.preventDefault());
+
+        box.addEventListener('drop', e => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text');
+            const draggableElement = document.getElementById(id);
+            const targetZone = box.getAttribute('data-zone');
+            const correctZone = draggableElement.getAttribute('data-ans');
+
+            // Sofortiges Feedback am Element
+            if (targetZone === correctZone) {
+                draggableElement.classList.remove('incorrect');
+                draggableElement.classList.add('correct');
+            } else {
+                draggableElement.classList.remove('correct');
+                draggableElement.classList.add('incorrect');
+            }
+
+            box.appendChild(draggableElement);
+        });
+    });
+
+    function resetDrag(num) {
+        const pool = document.getElementById('pool' + num);
+        const items = document.querySelectorAll('.drag-item');
+        items.forEach(item => {
+            item.className = 'drag-item';
+            pool.appendChild(item);
+        });
+    }
+
+    function showDragSolution(num) {
+        const boxes = document.querySelectorAll('.drop-box');
+        const items = document.querySelectorAll('.drag-item');
+        
+        items.forEach(item => {
+            const correctZone = item.getAttribute('data-ans');
+            const targetBox = document.querySelector(`.drop-box[data-zone="${correctZone}"]`);
+            item.classList.add('correct');
+            item.classList.remove('incorrect');
+            targetBox.appendChild(item);
+        });
+    }
+</script>
+
+</body>
+</html>
